@@ -13,7 +13,7 @@ Disciplina: Sistemas Operacionais
 pthread_mutex_t m;
 pthread_cond_t c;
 int t = 0, itemsOnBuffer = 0;
-int upper = 1000, lower = -1000; // faixa para numeros aleatorios
+int upper = 1000, lower = 0; // faixa para numeros aleatorios
 
 // structs para buffer e argumentos
 typedef struct buff node;
@@ -28,7 +28,6 @@ struct prod {
  node *B;
  int V;
 };
-
 // funções de inserção/remoção do buffer, primo e produtor/consumidor
 void insertOnBuffer(node *buffer){
   node *newNode = malloc(sizeof(node));
@@ -40,6 +39,7 @@ void insertOnBuffer(node *buffer){
 int removeFromBuffer(node *buffer){
   node *tail, *aux;
   tail = buffer;
+  aux = tail;
   while(tail->next != NULL){
     aux = tail;
     tail = tail->next;
@@ -48,6 +48,7 @@ int removeFromBuffer(node *buffer){
   int item = tail->content;
   free(tail);
   itemsOnBuffer--;
+	
   return item;
 }// removeFromBuffer
 void producer(void *args){
@@ -90,7 +91,13 @@ void consumer(void *args){
     } // if
   } // for
 } // consumer
-
+void endBuffer(node *buffer){
+  node *newNode = malloc(sizeof(node));
+  newNode->content = -1;
+  newNode->next = buffer->next;
+  buffer->next = newNode;
+  itemsOnBuffer++;
+} // endBuffer
 // main
 void main() {
   srand( (unsigned)time(NULL) );
@@ -100,6 +107,7 @@ void main() {
 
   node *buffer;
   buffer = malloc(sizeof(node));
+  buffer->next = NULL;
 
   pthread_mutex_init(&m, NULL);
   pthread_t producers[p], consumers[c];
@@ -125,6 +133,11 @@ void main() {
   for(i=0; i<p; i++){
     pthread_join(producers[i], NULL);
   }
+  // inserindo -1
+  for(i=0; i<c; i++){
+    endBuffer(buffer);
+  }
+
   for(i=0; i<c; i++){
     pthread_join(consumers[i], NULL);
   }
