@@ -7,7 +7,7 @@ Disciplina: Sistemas Operacionais
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <math.h>
+#include <math.h> // para abs() em número primo de valor negativo
 
 //variaveis de condicao
 pthread_mutex_t m;
