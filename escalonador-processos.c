@@ -1,3 +1,9 @@
+/*
+Escalonador de processos
+Autor: Christopher Conceição Moura
+Disciplina: Sistemas Operacionais
+*/
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,7 +15,7 @@ typedef enum
 typedef struct node
 {
     int arrival, duration, memory, priority, current;
-    struct process *next;
+    struct node *next;
 } process;
 
 process *createQueue()
@@ -81,9 +87,28 @@ boolean readProcessesFile(char fileName[], process *queue0, process *queue1, pro
     fclose(f);
     return true;
 }
+boolean dequeue(process *queue){
+    process *p = queue->next, *q = queue;
+    if(p == NULL) return false;
+    while(p->next != NULL){
+        p = p->next;
+        q = q->next;
+    }
+    q->next = NULL;
+    free(p);
+}
+void printQueue(process *queue){
+    process *p;
+    p = queue->next;
+    while(p != NULL){
+        printf("%d, %d, %d, %d, %d\n", p->arrival, p->duration, p->memory, p->priority, p->current);
+        p = p->next;
+    }
+}
 
 void run(int cpus, int sliceDuration, int totalMemory, process *queue0, process *queue1, process *queue2, process *queue3, process *queue4)
 {
+
 }
 void main()
 {
@@ -96,9 +121,19 @@ void main()
     queue2 = createQueue();
     queue3 = createQueue();
     queue4 = createQueue();
+
     scanf("%d %d %d %s", &cpus, &sliceDuration, &totalMemory, fileName);
     go = readProcessesFile(fileName, queue0, queue1, queue2, queue3, queue4);
     if (go)
         run(cpus, sliceDuration, totalMemory, queue0, queue1, queue2, queue3, queue4);
+    printQueue(queue1);
+    dequeue(queue1);
+    printQueue(queue1);
     printf("End of simulation.\n");
+
+    free(queue0);
+    free(queue1);
+    free(queue2);
+    free(queue3);
+    free(queue4);
 }
