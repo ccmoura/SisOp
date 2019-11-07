@@ -96,6 +96,7 @@ boolean dequeue(process *queue){
     }
     q->next = NULL;
     free(p);
+    return true;
 }
 void printQueue(process *queue){
     process *p;
